@@ -137,11 +137,214 @@ img.add_border {
 <p><br/><br/></p>
 <p></p>
 <p></p>
-<p>貪吃蛇</p>
-<div class="map"><canvas height="600" id="canvas" width="900"> </canvas></div>
-<script src="/get_page/0000/javascript/snake.js">
+<p></p>
+<p>JS貪吃蛇-練習</p>
+<script type="”text/javascript”">
+var Direction = new function () {
+this.UP = 38;
+this.RIGHT = 39;
+this.DOWN = 40;
+this.LEFT = 37;
+};
+var Common = new function () {
+this.width = 20; /*水平方向方格數*/
+this.height = 20; /*垂直方向方格數*/
+this.speed = 250; /*速度 值越小越快*/
+this.workThread = null;
+};
+var Main = new function () {
+var control = new Control();
+window.onload = function () {
+control.Init(“pannel”);
+/*開始按鈕*/
+document.getElementById(“btnStart”).onclick = function () {
+control.Start();
+this.disabled = true;
+document.getElementById(“selSpeed”).disabled = true;
+document.getElementById(“selSize”).disabled = true;
+};
+/*調速度按鈕*/
+document.getElementById(“selSpeed”).onchange = function () {
+Common.speed = this.value;
+}
+/*調大小按鈕*/
+document.getElementById(“selSize”).onchange = function () {
+Common.width = this.value;
+Common.height = this.value;
+control.Init(“pannel”);
+}
+};
+};
+/*控制器*/
+function Control() {
+this.snake = new Snake();
+this.food = new Food();
+/*初始化函式，建立表格*/
+this.Init = function (pid) {
+var html = [];
+html.push(“<table>”);
+for (var y = 0; y < Common.height; y ) {
+html.push(“<tr>”);
+for (var x = 0; x < Common.width; x ) {
+html.push(‘<td id=”box_’ x “_” y ‘”> </td>’);
+}
+html.push(“</tr>”);
+}
+html.push(“</table>”);
+this.pannel = document.getElementById(pid);
+this.pannel.innerHTML = html.join(“”);
+};
+/*開始遊戲 – 監聽鍵盤、建立食物、重新整理介面執行緒*/
+this.Start = function () {
+var me = this;
+this.MoveSnake = function (ev) {
+var evt = window.event || ev;
+me.snake.SetDir(evt.keyCode);
+};
+try {
+document.attachEvent(“onkeydown”, this.MoveSnake);
+} catch (e) {
+document.addEventListener(“keydown”, this.MoveSnake, false);
+}
+this.food.Create();
+Common.workThread = setInterval(function () {
+me.snake.Eat(me.food); me.snake.Move();
+}, Common.speed);
+};
+}
+/*蛇*/
+function Snake() {
+this.isDone = false;
+this.dir = Direction.RIGHT;
+this.pos = new Array(new Position());
+/*移動 – 擦除尾部，向前移動，判斷遊戲結束(咬到自己或者移出邊界)*/
+this.Move = function () {
+document.getElementById(“box_” this.pos[0].X “_” this.pos[0].Y).className = “”;
+//所有 向前移動一步
+for (var i = 0; i < this.pos.length – 1; i ) {
+this.pos[i].X = this.pos[i 1].X;
+this.pos[i].Y = this.pos[i 1].Y;
+}
+//重新設定頭的位置
+var head = this.pos[this.pos.length – 1];
+switch (this.dir) {
+case Direction.UP:
+head.Y–;
+break;
+case Direction.RIGHT:
+head.X ;
+break;
+case Direction.DOWN:
+head.Y ;
+break;
+case Direction.LEFT:
+head.X–;
+break;
+}
+this.pos[this.pos.length – 1] = head;
+//遍歷畫蛇，同時判斷遊戲結束
+for (var i = 0; i < this.pos.length; i ) {
+var isExits = false;
+for (var j = i 1; j < this.pos.length; j )
+if (this.pos[j].X == this.pos[i].X && this.pos[j].Y == this.pos[i].Y) {
+isExits = true;
+break;
+}
+if (isExits) { this.Over();/*咬自己*/ break; }
+var obj = document.getElementById(“box_” this.pos[i].X “_” this.pos[i].Y);
+if (obj) obj.className = “snake”; else { this.Over();/*移出邊界*/ break; }
+}
+this.isDone = true;
+};
+/*遊戲結束*/
+this.Over = function () {
+clearInterval(Common.workThread);
+alert(“遊戲結束！”);
+}
+/*吃食物*/
+this.Eat = function (food) {
+var head = this.pos[this.pos.length – 1];
+var isEat = false;
+switch (this.dir) {
+case Direction.UP:
+if (head.X == food.pos.X && head.Y == food.pos.Y 1) isEat = true;
+break;
+case Direction.RIGHT:
+if (head.Y == food.pos.Y && head.X == food.pos.X – 1) isEat = true;
+break;
+case Direction.DOWN:
+if (head.X == food.pos.X && head.Y == food.pos.Y – 1) isEat = true;
+break;
+case Direction.LEFT:
+if (head.Y == food.pos.Y && head.X == food.pos.X 1) isEat = true;
+break;
+}
+if (isEat) {
+this.pos[this.pos.length] = new Position(food.pos.X, food.pos.Y);
+food.Create(this.pos);
+}
+};
+/*控制移動方向*/
+this.SetDir = function (dir) {
+switch (dir) {
+case Direction.UP:
+if (this.isDone && this.dir != Direction.DOWN) { this.dir = dir; this.isDone = false; }
+break;
+case Direction.RIGHT:
+if (this.isDone && this.dir != Direction.LEFT) { this.dir = dir; this.isDone = false; }
+break;
+case Direction.DOWN:
+if (this.isDone && this.dir != Direction.UP) { this.dir = dir; this.isDone = false; }
+break;
+case Direction.LEFT:
+if (this.isDone && this.dir != Direction.RIGHT) { this.dir = dir; this.isDone = false; }
+break;
+}
+};
+}
+/*食物*/
+function Food() {
+this.pos = new Position();
+/*建立食物 – 隨機位置建立立*/
+this.Create = function (pos) {
+document.getElementById(“box_” this.pos.X “_” this.pos.Y).className = “”;
+var x = 0, y = 0, isCover = false;
+/*排除蛇的位置*/
+do {
+x = parseInt(Math.random() * (Common.width – 1));
+y = parseInt(Math.random() * (Common.height – 1));
+isCover = false;
+if (pos instanceof Array) {
+for (var i = 0; i < pos.length; i ) {
+if (x == pos[i].X && y == pos[i].Y) {
+isCover = true;
+break;
+}
+}
+}
+} while (isCover);
+this.pos = new Position(x, y);
+document.getElementById(“box_” x “_” y).className = “food”;
+};
+}
+function Position(x, y) {
+this.X = 0;
+this.Y = 0;
+if (arguments.length >= 1) this.X = x;
+if (arguments.length >= 2) this.Y = y;
+}
 </script>
-<p>javascript程式碼： //獲取繪製工具 /* var canvas = document.getElementById("canvas"); var ctx = canvas.getContext("2d");//獲取上下文 ctx.moveTo(0,0); ctx.lineTo(450,450);*/ var c=document.getElementById("canvas"); var ctx=c.getContext("2d"); /*ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(450,450); ctx.stroke(); */ var snake =[];//定義一條蛇，畫蛇的身體 var snakeCount = 6;//初始化蛇的長度 var foodx =0; var foody =0; var togo =0; function drawtable()//畫地圖的函式 { for(var i=0;i&lt;60;i++)//畫豎線 { ctx.strokeStyle="black"; ctx.beginPath(); ctx.moveTo(15*i,0); ctx.lineTo(15*i,600); ctx.closePath(); ctx.stroke(); } for(var j=0;j&lt;40;j++)//畫橫線 { ctx.strokeStyle="black"; ctx.beginPath(); ctx.moveTo(0,15*j); ctx.lineTo(900,15*j); ctx.closePath(); ctx.stroke(); } for(var k=0;k&lt;snakeCount;k++)//畫蛇的身體 { ctx.fillStyle="#000"; if (k==snakeCount-1) { ctx.fillStyle="red";//蛇頭的顏色與身體區分開 } ctx.fillRect(snake[k].x,snake[k].y,15,15);//前兩個數是矩形的起始座標，後兩個數是矩形的長寬。 } //繪製食物 ctx.fillStyle ="black"; ctx.fillRect(foodx,foody,15,15); ctx.fill(); } function start()//定義蛇的座標 { //var snake =[];//定義一條蛇，畫蛇的身體 //var snakeCount = 6;//初始化蛇的長度 for(var k=0;k&lt;snakeCount;k++) { snake[k]={x:k*15,y:0}; } drawtable(); addfood();//在start中呼叫新增食物函式 } function addfood() { foodx = Math.floor(Math.random()*60)*15; //隨機產生一個0-1之間的數 foody = Math.floor(Math.random()*40)*15; for (var k=0;k&lt;snake;k++) { if (foodx==snake[k].x&amp;&amp;foody==sanke[k].y)//防止產生的隨機食物落在蛇身上 { addfood(); } } } function move() { switch (togo) { case 1: snake.push({x:snake[snakeCount-1].x-15,y:snake[snakeCount-1].y}); break;//向左走 case 2: snake.push({x:snake[snakeCount-1].x,y:snake[snakeCount-1].y-15}); break; case 3: snake.push({x:snake[snakeCount-1].x+15,y:snake[snakeCount-1].y}); break; case 4: snake.push({x:snake[snakeCount-1].x,y:snake[snakeCount-1].y+15}); break; case 5: snake.push({x:snake[snakeCount-1].x-15,y:snake[snakeCount-1].y-15}); break; case 6: snake.push({x:snake[snakeCount-1].x+15,y:snake[snakeCount-1].y+15}); break; default: snake.push({x:snake[snakeCount-1].x+15,y:snake[snakeCount-1].y}); } snake.shift();//刪除陣列第一個元素 ctx.clearRect(0,0,900,600);//清除畫布重新繪製 isEat(); isDead(); drawtable(); } function keydown(e) { switch(e.keyCode) { case 37: togo=1; break; case 38: togo=2; break; case 39: togo=3; break; case 40: togo=4; break; case 65: togo=5; break; case 68: togo=6; break; } } function isEat()//吃到食物後長度加1 { if(snake[snakeCount-1].x==foodx&amp;&amp;snake[snakeCount-1].y==foody) { addfood(); snakeCount++; snake.unshift({x:-15,y:-15}); } } function isDead() { if (snake[snakeCount-1].x&gt;885||snake[snakeCount-1].y&gt;585||snake[snakeCount-1].x&lt;0||snake[snakeCount-1].y&lt;0) { alert("You are dead,GAME OVER!!!"); window.location.reload(); } } document.onkeydown=function(e) { keydown(e); } window.onload = function()//呼叫函式 { start(); setInterval(move,150); drawtable(); }</p><br />HW3 << <a href='HW3.html'>Previous</a> </div>
+<div 10px="" id="”pannel”"></div>
+<select id="”selSize”">
+<option value="”20″">20*20</option>
+<option value="”30″">30*30</option>
+<option value="”40″">40*40</option>
+</select><select id="”selSpeed”">
+<option value="”500″">速度-慢</option>
+<option selected="selected" value="”250″">速度-中</option>
+<option value="”100″">速度-快</option>
+</select>
+<p><input id="”btnStart”" type="”button”" value="”開始”"/></p><br />HW3 << <a href='HW3.html'>Previous</a> </div>
         
     <!-- footer -->
       <div class="container">
