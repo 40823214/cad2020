@@ -1231,15 +1231,10 @@
 <p><span><img alt="" height="429" src="/images/hw3_animation.gif" width="600"/></span></p>
 <p><span></span></p>
 <h1>000</h1>
-<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;新建網頁&lt;/title&gt;
-    &lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"/&gt;
-    &lt;meta name="description" content=""/&gt;
-    &lt;meta name="keywords" content=""/&gt;
-
-    &lt;script type="text/javascript"&gt;
+<p><br/><br/></p>
+<p></p>
+<p>新建網頁</p>
+<script type="text/javascript">
         //① 繪製地圖
         function Map() {
             //私有成員(不會隨便發生變化)
@@ -1300,7 +1295,7 @@
             //a.繪製小蛇
             this.showsnake = function () {
                 //遍歷小蛇的各個蛇節，並依次建立即可
-                for (var i = 0; i &lt; this.snakebody.length; i++) {
+                for (var i = 0; i < this.snakebody.length; i++) {
                     //this.snakebody[i]//代表每個蛇節
                     //建立蛇節div
                     if (this.snakebody[i][3] === null) {//判斷沒有建立對應的蛇節
@@ -1321,7 +1316,7 @@
             //b.移動小蛇
             this.movesnake = function () {
                 //非蛇頭蛇節(當前蛇節的新座標 是"下個蛇節"的舊座標)
-                for (var i = 0; i &lt; this.snakebody.length - 1; i++) {
+                for (var i = 0; i < this.snakebody.length - 1; i++) {
                     this.snakebody[i][0] = this.snakebody[i + 1][0];
                     this.snakebody[i][1] = this.snakebody[i + 1][1];
                 }
@@ -1347,7 +1342,7 @@
                 var xSnake = this.snakebody[this.snakebody.length - 1][0];
                 var ySnake = this.snakebody[this.snakebody.length - 1][1];
                 //食物座標food.xFood/food.yFood;
-                if (xSnake == food.xFood &amp;&amp; ySnake == food.yFood) {
+                if (xSnake == food.xFood && ySnake == food.yFood) {
                     //吃食物增加蛇節
                     var newjie = [this.snakebody[0][0], this.snakebody[0][1], 'green', null];
                     this.snakebody.unshift(newjie);//把newjie放到陣列的第一個位置去
@@ -1357,14 +1352,14 @@
                 }
 
                 //控制小蛇在地圖範圍內移動
-                if (xSnake &lt; 0 || xSnake &gt; 39 || ySnake &lt; 0 || ySnake &gt; 19) {
+                if (xSnake < 0 || xSnake > 39 || ySnake < 0 || ySnake > 19) {
                     alert('game over');
                     clearInterval(mytime);
                     return false;
                 }
                 //吃到自己判斷(蛇頭座標與其他蛇節座標一致)
-                for (var k = 0; k &lt; this.snakebody.length - 1; k++) {
-                    if (this.snakebody[k][0] == xSnake &amp;&amp; this.snakebody[k][1] == ySnake) {
+                for (var k = 0; k < this.snakebody.length - 1; k++) {
+                    if (this.snakebody[k][0] == xSnake && this.snakebody[k][1] == ySnake) {
                         alert('game over kill you by yourself');
                         clearInterval(mytime);
                         return false;
@@ -1407,14 +1402,5 @@
                 }
             }
         }
-    &lt;/script&gt;
-
-    &lt;style type="text/css"&gt;
-        body {
-            margin: 0;
-        }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;&lt;/body&gt;
-&lt;/html&gt;</pre>
-<p><br/><br/></p>
+    
+</script>
